@@ -2,7 +2,7 @@
 #include "motor_methods.h"
 //#include "QSerial.h"
 
-#define lightThresh 525
+#define lightThresh 300
 
 //Pin definitions
 static const int IR_RECEIVER = 0; 
@@ -37,7 +37,7 @@ struct dc_motor drive_motors[2];
 directions dir;
 
 void setup() {
-    Serial.begin( 3600 );
+    Serial.begin( 9600 );
     
     //irs.attach(0, -1);
     
@@ -59,7 +59,7 @@ void setup() {
 
     servo_base.write(105);
     servo_tilt.write(160);
-    servo_grip.write(0);
+    servo_grip.write(50);
     
     pinMode(LIGHT_ANA1_LEFT, INPUT);
     pinMode(LIGHT_ANA2_MID, INPUT);
@@ -68,28 +68,33 @@ void setup() {
 }
 
 void loop() {
-  check_motors();
+ // check_motors();
   
-//  check_light();
+ // check_light();
 //  delay(100);
 //  
-//  check_bumpers();
-//  delay(100);
+  //check_bumpers();
+ //delay(1000);
 //
-//  check_grip();
-//  delay(100);
+// check_grip();
+    delay(2000);
+  
+   drive();
+   delay(50);
+   grab_ball();
   
 }
 
 void check_light() {
+  while(Serial.available() <= 0 ) {
     Serial.print("LIGHT_LEFT:  ");
     Serial.println(analogRead(LIGHT_ANA1_LEFT));
-
-    Serial.print("LIGHT_MID:   ");
-    Serial.println(analogRead(LIGHT_ANA2_MID));
-
-    Serial.print("LIGHT_RIGHT: ");
-    Serial.println(analogRead(LIGHT_ANA3_RIGHT));
+  }
+//    Serial.print("LIGHT_MID:   ");
+//    Serial.println(analogRead(LIGHT_ANA2_MID));
+//
+//    Serial.print("LIGHT_RIGHT: ");
+//    Serial.println(analogRead(LIGHT_ANA3_RIGHT));
 }
 
 void check_motors() {
@@ -105,12 +110,14 @@ void check_motors() {
 }
 
 void check_bumpers() {
+ // while(Serial.available)()
+  //{
     Serial.print("Value left bumper: ");
     Serial.println(digitalRead(BUMP_LEFT));
 
     Serial.print("Value right bumper: ");
     Serial.println(digitalRead(BUMP_RIGHT));
-
+ // }
     return;
 }
 
@@ -124,4 +131,51 @@ void check_ir() {
     while(Serial.available() <= 0) delay(100);
     Serial.println(Serial.read());
     Serial.flush();
+}
+
+void grab_ball() {
+    servo_base.write(15);
+    delay(1000);
+    servo_tilt.write(100);
+    
+    
+    int gripThresh = sample_grip_sensor();
+    int gripPos = 50;
+    
+    while(gripThresh <= 400) {
+     gripPos++;
+     servo_grip.write(gripPos);
+     delay(50);
+     gripThresh = sample_grip_sensor();
+    }
+    
+    
+    servo_tilt.write(160);
+    servo_base.write(105);
+    delay(1000);
+    servo_grip.write(50);
+    
+}
+
+
+void drive() {
+  int light_right = analogRead(LIGHT_ANA3_RIGHT);
+  int light_mid = analogRead(LIGHT_ANA2_MID);
+  int light_left = analogRead(LIGHT_ANA1_LEFT);
+  
+  set_motor_state( drive_motors[LEFT_MOTOR], 120, FORWARD );
+  set_motor_state( drive_motors[RIGHT_MOTOR], 120, FORWARD );
+  
+  while( light_right >= lightThresh || light_mid >= lightThresh || light_left >= lightThresh) {
+      light_right = analogRead(LIGHT_ANA3_RIGHT);
+      light_mid = analogRead(LIGHT_ANA2_MID);
+      light_left = analogRead(LIGHT_ANA1_LEFT);
+      
+      set_motor_state( drive_motors[LEFT_MOTOR], 100, FORWARD );
+      set_motor_state( drive_motors[RIGHT_MOTOR], 100, FORWARD );
+  }
+  
+  set_motor_state( drive_motors[LEFT_MOTOR], 0, FORWARD );
+  set_motor_state( drive_motors[RIGHT_MOTOR], 0, FORWARD );
+  
 }
