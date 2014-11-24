@@ -1,15 +1,15 @@
 #include <Servo.h>
 #include "motor_methods.h"
-//#include "line_sensors.h"
-//#include "servo_methods.h"
-//#include "target_methods.h"
+#include "line_sensors.h"
+#include "servo_methods.h"
+#include "target_methods.h"
 
-#define lightThresh 250
+#define lightThresh 300
 
 //Pin definitions
 static const int RED_LED = 13;
-//static const int YELLOW_LED = 3;
-//static const int GREEN_LED = 3;
+static const int RED2_LED = 3;
+static const int GREEN_LED = 2;
 
 static const int SERVO_BASE = 11;
 static const int SERVO_TILT = 10;
@@ -35,8 +35,11 @@ Servo servo_base;
 Servo servo_tilt;
 Servo servo_grip;
 
+int turn_count = 0;
+
 struct dc_motor drive_motors[2];
-//struct line_tracker track_light[3];
+struct line_tracker light_sensor;
+struct target target_list;
 
 void setup() {
     Serial.begin( 9600 );
@@ -57,26 +60,51 @@ void setup() {
     servo_tilt.attach(SERVO_TILT);
     servo_grip.attach(SERVO_GRIP);
     
-    pinMode(LIGHT_LEFT, INPUT);
-    pinMode(LIGHT_MID, INPUT);
-    pinMode(LIGHT_RIGHT, INPUT);
+    servo_grip.write(110);
     
+    light_sensor.left_pin = LIGHT_LEFT;
+    light_sensor.mid_pin = LIGHT_MID;
+    light_sensor.right_pin = LIGHT_RIGHT;
+    
+    init_lineTracker( light_sensor );
+//    target_list.row[5] = { 0 0 0 0 0 };
+//    target_list.col[5] = { 0, 0, 0, 0, 0 };
+    
+    pinMode(GREEN_LED, OUTPUT);
+    pinMode(RED2_LED, OUTPUT);
     pinMode(RED_LED, OUTPUT);
     
 }
 
 void loop() {
+    
+      
+    while( turn_count < 7 ) {
+       drive();
+     
+    }
+     
+     while(1){};
+//     
+//     Serial.println(check_light(LIGHT_RIGHT));
+//     Serial.flush();
+//     delay(200);
+//   
   
-   drive();
-   //delay(50);
-   //grab_ball();
-        
-   while(1) {}
-   
-//   Serial.println(check_right_light());
-//   Serial.flush();
-//   delay(500);
-  
+}
+
+void radiate_begin() {
+   digitalWrite(RED2_LED, HIGH);
+   digitalWrite(RED_LED, HIGH);
+   delay(1000);
+}
+
+void radiate_end() {
+   digitalWrite(GREEN_LED, HIGH);
+   digitalWrite(RED2_LED, LOW);
+   digitalWrite(RED_LED, LOW);
+   delay(1000);
+   digitalWrite(GREEN_LED, LOW); 
 }
 
 int check_left_light() {
@@ -103,26 +131,10 @@ void check_motors() {
     return;
 }
 
-void check_bumpers() {
-    Serial.print("Value left bumper: ");
-    Serial.println(digitalRead(BUMP_LEFT));
-
-    Serial.print("Value right bumper: ");
-    Serial.println(digitalRead(BUMP_RIGHT));
-
-    return;
-}
-
 void check_grip() {
-    Serial.println(sample_grip_sensor());
+    Serial.println( sample_grip_sensor() );
     
     return;
-}
-
-void check_ir() {
-    while(Serial.available() <= 0) delay( 100 );
-    Serial.println(Serial.read());
-    Serial.flush();
 }
 
 void grab_ball() {
@@ -150,25 +162,56 @@ void grab_ball() {
 
 
 void drive() {
-  int light_right = analogRead(LIGHT_RIGHT);
-  //int light_mid = analogRead(LIGHT_MID);
-  int light_left = analogRead(LIGHT_LEFT);
-  
-//  drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//  
- while( check_left_light() >= lightThresh || check_right_light() >= lightThresh ) {
+  while( check_light(LIGHT_LEFT) > lightThresh || check_light(LIGHT_RIGHT) > lightThresh ) {
+    if( check_light(LIGHT_LEFT) < lightThresh ) {
+//      if( is_left_target( light_sensor ) && !(is_turn( light_sensor))) {
+//         Serial.println("left target");
+//           stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//           radiate_begin();
+//           erradicate_left( servo_base, servo_grip );
+//           radiate_end();
+//           drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//           delay(300);
+//       } else {
+           correct_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//       }
+    } else if( check_light(LIGHT_RIGHT) < lightThresh ) {
+//        if( is_right_target( light_sensor && !(is_turn( light_sensor))) ) {
+//           Serial.println("right target");
+//             stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//             radiate_begin();
+//             erradicate_right( servo_base, servo_grip );
+//             radiate_end();
+//             drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//             delay(300);
+//         } else {
+             correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+//         }
+    } else if( check_light( LIGHT_MID ) > lightThresh && check_light( LIGHT_LEFT ) > lightThresh && check_light( LIGHT_RIGHT ) > lightThresh){
+        track_position( target_list, turn_count, is_left_target( light_sensor ), is_right_target( light_sensor ) );
+        delay(270);
+    }
+    else {
+        drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+    }
     
-      if( check_right_light() < lightThresh ) {
-          correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-       }else if(check_left_light() < lightThresh) {
-          correct_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-       }else{
-          drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-       }   
-}  
-  if(check_left_light() < lightThresh && check_right_light() < lightThresh ) {
-             stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-   
-   }
+  }
+  
+  
+  if( is_turn( light_sensor ) ) {
+     turn_count++;
+     Serial.print("Turn count: ");
+     Serial.println( turn_count );
+     
+     if( turn_count <= 3 ) {
+       Serial.println("turn left");
+       turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+     } else if( turn_count <= 6 ) {
+       Serial.println("turn right");
+       turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+     } else 
+       Serial.println("stop here");
+       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+  }
   
 }
