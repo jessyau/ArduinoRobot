@@ -6,6 +6,6 @@
 
 int erradicate_left( Servo, Servo );
 int erradicate_right( Servo, Servo );
+int sample_grip_sensor();
 
 #endif
-

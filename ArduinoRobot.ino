@@ -80,11 +80,11 @@ void loop() {
     
       
     while( turn_count < 7 ) {
-       drive();
+       destroy_shit();
      
     }
      
-     while(1){};
+//     while(1){};
 //     
 //     Serial.println(check_light(LIGHT_RIGHT));
 //     Serial.flush();
@@ -93,12 +93,14 @@ void loop() {
   
 }
 
+//Turn on Red LEDs to signal the beginning of "tuberculosis treatment"
 void radiate_begin() {
    digitalWrite(RED2_LED, HIGH);
    digitalWrite(RED_LED, HIGH);
    delay(1000);
 }
 
+//Turns off Red LEDS and turns on Green LEDS to signal the end of "tuberculosis treatment"
 void radiate_end() {
    digitalWrite(GREEN_LED, HIGH);
    digitalWrite(RED2_LED, LOW);
@@ -107,36 +109,8 @@ void radiate_end() {
    digitalWrite(GREEN_LED, LOW); 
 }
 
-int check_left_light() {
-  return analogRead(LIGHT_LEFT);
-}
 
-int check_mid_light() {
-  return analogRead(LIGHT_MID);
-}
-
-int check_right_light() {
-  return analogRead(LIGHT_RIGHT);
-}
-
-void check_motors() {
-    digitalWrite(MOTOR_M1, LOW);
-    analogWrite(MOTOR_E1, 100);
-
-    digitalWrite(MOTOR_M2, LOW);
-    analogWrite(MOTOR_E2, 100);
-
-    delay(1000);
-
-    return;
-}
-
-void check_grip() {
-    Serial.println( sample_grip_sensor() );
-    
-    return;
-}
-
+// For progress report 1 demonstration -- grabs a ball with servo arm and releases it
 void grab_ball() {
     servo_base.write( 15 );
     delay( 1000 );
@@ -160,8 +134,8 @@ void grab_ball() {
     
 }
 
-
-void drive() {
+// Conditional statements dictate whether to line correct left or right or track position in map
+void destroy_shit() {
   while( check_light(LIGHT_LEFT) > lightThresh || check_light(LIGHT_RIGHT) > lightThresh ) {
     if( check_light(LIGHT_LEFT) < lightThresh ) {
 //      if( is_left_target( light_sensor ) && !(is_turn( light_sensor))) {
@@ -197,7 +171,8 @@ void drive() {
     
   }
   
-  
+ // Checks for markers for a turn and turns a certain direction based on count
+ // Left turns for the first 3 turns, Right turns for the next 3
   if( is_turn( light_sensor ) ) {
      turn_count++;
      Serial.print("Turn count: ");

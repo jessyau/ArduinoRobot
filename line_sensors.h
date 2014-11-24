@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+// Struct will be used to store references to line tracker pins
 struct line_tracker {
   int left_pin;
   int mid_pin;

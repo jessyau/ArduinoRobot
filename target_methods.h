@@ -13,4 +13,3 @@ int track_target( struct target, int );
 int print_target ( struct target );
 
 #endif
-

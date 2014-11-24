@@ -27,7 +27,4 @@ int stop_motors( struct dc_motor, struct dc_motor );
 int turn_left( struct dc_motor, struct dc_motor, int );
 int turn_right( struct dc_motor, struct dc_motor, int );
 
-int sample_grip_sensor();
-
 #endif
-
