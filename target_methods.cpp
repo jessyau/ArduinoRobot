@@ -34,7 +34,10 @@ int track_position( struct target _Target, int turn, int target_left, int target
        row = 2;
        track_target( _Target, targetNum );
      }
-  } else if ( turn < 6 && turn > 4 ) {
+  } else if ( turn == 5 ) {
+    Serial.print("Column count: ");
+    Serial.println(col);
+    
      col++;
     if( target_right == 1 ) {
        row = 1;

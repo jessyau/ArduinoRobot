@@ -4,7 +4,7 @@
 #include "servo_methods.h"
 #include "target_methods.h"
 
-#define lightThresh 300
+#define lightThresh 350
 
 //Pin definitions
 static const int RED_LED = 13;
@@ -60,7 +60,7 @@ void setup() {
     servo_tilt.attach(SERVO_TILT);
     servo_grip.attach(SERVO_GRIP);
     
-    servo_grip.write(110);
+    servo_grip.write(160);
     
     light_sensor.left_pin = LIGHT_LEFT;
     light_sensor.mid_pin = LIGHT_MID;
@@ -79,12 +79,15 @@ void setup() {
 void loop() {
     
       
-    while( turn_count < 7 ) {
-       destroy_shit();
-     
-    }
-     
-//     while(1){};
+//    while( turn_count < 7 ) {
+//       destroy_shit();
+//     
+//    }
+
+    erradicate_right( servo_base, servo_grip );
+    delay(2000);
+
+    //while(1){};
 //     
 //     Serial.println(check_light(LIGHT_RIGHT));
 //     Serial.flush();

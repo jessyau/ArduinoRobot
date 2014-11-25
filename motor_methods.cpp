@@ -1,7 +1,7 @@
 #include "motor_methods.h"
 #include "line_sensors.h"
 
-#define lightThresh 300
+#define lightThresh 350
 
 // Motor struct to store references to motor and motor encoder pins
 int init_motor( struct dc_motor _new_motor ) {
@@ -24,8 +24,8 @@ int set_motor_state( struct dc_motor motor, int power, enum directions dir ) {
 
 // Line corrects if robot is veering to the left
 int correct_right( struct dc_motor left_motor, struct dc_motor right_motor ) {
-    set_motor_state( left_motor, 130, FORWARD );
-    set_motor_state( right_motor, 80, FORWARD );
+    set_motor_state( left_motor, 110, FORWARD );
+    set_motor_state( right_motor, 60, FORWARD );
     delay(100);
     
     return 0;
@@ -33,17 +33,17 @@ int correct_right( struct dc_motor left_motor, struct dc_motor right_motor ) {
 
 // Line corrects if robot is veering to the right
 int correct_left( struct dc_motor left_motor, struct dc_motor right_motor ) {
-    set_motor_state( left_motor, 80, FORWARD );
-    set_motor_state( right_motor, 130, FORWARD );
-    delay(50);
+    set_motor_state( left_motor, 60, FORWARD );
+    set_motor_state( right_motor, 110, FORWARD );
+    delay(100);
     
     return 0;
 }
 
 // Rotates both motors in same direction
 int drive_straight( struct dc_motor left_motor, struct dc_motor right_motor ) {
-    set_motor_state( left_motor, 120, FORWARD );
-    set_motor_state( right_motor, 120, FORWARD );
+    set_motor_state( left_motor, 95, FORWARD );
+    set_motor_state( right_motor, 100, FORWARD );
     delay(50);
     
     return 0;
@@ -64,8 +64,8 @@ int turn_left( struct dc_motor left_motor, struct dc_motor right_motor, int ligh
     
     delay(600);
   
-    set_motor_state( left_motor, 120, BACKWARD );
-    set_motor_state( right_motor, 120, FORWARD );
+    set_motor_state( left_motor, 95, BACKWARD );
+    set_motor_state( right_motor, 100, FORWARD );
     
     while ( check_light( light_pin ) > lightThresh ) {
         delay(85);
@@ -83,8 +83,8 @@ int turn_right( struct dc_motor left_motor, struct dc_motor right_motor, int lig
     
     delay(600);
   
-    set_motor_state( left_motor, 120, FORWARD );
-    set_motor_state( right_motor, 120, BACKWARD );
+    set_motor_state( left_motor, 95, FORWARD );
+    set_motor_state( right_motor, 100, BACKWARD );
     
     while ( check_light( light_pin ) > lightThresh ) {
         delay(80);
