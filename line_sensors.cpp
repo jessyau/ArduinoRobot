@@ -16,7 +16,7 @@ int check_light( int light_pin ) {
 }
 
 // If line tracker detects black on all 3 sensors, will return 1 to signify that it is a turn
-int is_turn( struct line_tracker tracker ) {
+int is_target( struct line_tracker tracker ) {
     if( check_light( tracker.left_pin ) < lightThresh && check_light( tracker.mid_pin ) < lightThresh && check_light( tracker.right_pin ) < lightThresh ) 
         return 1;
     else 

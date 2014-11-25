@@ -1,13 +1,15 @@
 #include "target_methods.h"
 #include <LinkedList.h>
 
+int count = 0;
 int col = 0;
 int row = 0;
 int targetNum = 0;
 
 
-int track_position( struct target _Target, int turn, int target_left, int target_right ) {
-  if ( turn == 1 ) {
+int track_position( struct target _Target, int target_left, int target_right ) {
+  if ( count < 6) {
+    count++;
     col++;
     
     Serial.print("Column count: ");
@@ -20,8 +22,9 @@ int track_position( struct target _Target, int turn, int target_left, int target
         row = 4;
         track_target( _Target, targetNum );
     }
-  } else if ( turn == 3) {
-     col--;
+  } else if ( count > 5 ) {
+    count++;
+    col--;
      
      Serial.print("Column count: ");
      Serial.println(col);
@@ -34,11 +37,13 @@ int track_position( struct target _Target, int turn, int target_left, int target
        row = 2;
        track_target( _Target, targetNum );
      }
-  } else if ( turn == 5 ) {
+  } else if ( count > 9  ) {
     Serial.print("Column count: ");
     Serial.println(col);
     
+     count++;
      col++;
+     
     if( target_right == 1 ) {
        row = 1;
        track_target( _Target, targetNum );
@@ -46,6 +51,10 @@ int track_position( struct target _Target, int turn, int target_left, int target
   } 
   
   return 0;
+}
+
+int get_col() {
+  return col;
 }
 
 int track_target( struct target _newTarget, int targetNum ) {

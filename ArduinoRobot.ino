@@ -35,7 +35,7 @@ Servo servo_base;
 Servo servo_tilt;
 Servo servo_grip;
 
-int turn_count = 0;
+int target_count = 0;
 
 struct dc_motor drive_motors[2];
 struct line_tracker light_sensor;
@@ -79,15 +79,15 @@ void setup() {
 void loop() {
     
       
-//    while( turn_count < 7 ) {
-//       destroy_shit();
-//     
-//    }
+    while( target_count < 6 ) {
+       destroy_shit();
+     
+    }
 
-    erradicate_right( servo_base, servo_grip );
-    delay(2000);
+//    erradicate_right( servo_base, servo_grip );
+//    delay(2000);
 
-    //while(1){};
+    while(1){};
 //     
 //     Serial.println(check_light(LIGHT_RIGHT));
 //     Serial.flush();
@@ -165,7 +165,7 @@ void destroy_shit() {
              correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
 //         }
     } else if( check_light( LIGHT_MID ) > lightThresh && check_light( LIGHT_LEFT ) > lightThresh && check_light( LIGHT_RIGHT ) > lightThresh){
-        track_position( target_list, turn_count, is_left_target( light_sensor ), is_right_target( light_sensor ) );
+        track_position( target_list, is_left_target( light_sensor ), is_right_target( light_sensor ) );
         delay(270);
     }
     else {
@@ -176,20 +176,21 @@ void destroy_shit() {
   
  // Checks for markers for a turn and turns a certain direction based on count
  // Left turns for the first 3 turns, Right turns for the next 3
-  if( is_turn( light_sensor ) ) {
-     turn_count++;
-     Serial.print("Turn count: ");
-     Serial.println( turn_count );
+  if( is_target( light_sensor )) {
+     target_count++;
      
-     if( turn_count <= 3 ) {
-       Serial.println("turn left");
-       turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
-     } else if( turn_count <= 6 ) {
-       Serial.println("turn right");
-       turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
-     } else 
-       Serial.println("stop here");
-       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+     Serial.print("Target count: ");
+     Serial.println( target_count );
+     
+     stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+     erradicate_right( servo_base, servo_grip );
+     delay(500);
+     erradicate_left( servo_base, servo_grip );
+     drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+     delay(300);
+     
   }
+  
+  stop_motors( LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
   
 }

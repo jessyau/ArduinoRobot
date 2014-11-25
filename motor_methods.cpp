@@ -24,18 +24,18 @@ int set_motor_state( struct dc_motor motor, int power, enum directions dir ) {
 
 // Line corrects if robot is veering to the left
 int correct_right( struct dc_motor left_motor, struct dc_motor right_motor ) {
-    set_motor_state( left_motor, 110, FORWARD );
-    set_motor_state( right_motor, 60, FORWARD );
-    delay(100);
+    set_motor_state( left_motor, 120, FORWARD );
+    set_motor_state( right_motor, 70, FORWARD );
+    delay(10);
     
     return 0;
 }
 
 // Line corrects if robot is veering to the right
 int correct_left( struct dc_motor left_motor, struct dc_motor right_motor ) {
-    set_motor_state( left_motor, 60, FORWARD );
-    set_motor_state( right_motor, 110, FORWARD );
-    delay(100);
+    set_motor_state( left_motor, 70, FORWARD );
+    set_motor_state( right_motor, 120, FORWARD );
+    delay(10);
     
     return 0;
 }
@@ -44,7 +44,7 @@ int correct_left( struct dc_motor left_motor, struct dc_motor right_motor ) {
 int drive_straight( struct dc_motor left_motor, struct dc_motor right_motor ) {
     set_motor_state( left_motor, 95, FORWARD );
     set_motor_state( right_motor, 100, FORWARD );
-    delay(50);
+    delay(10);
     
     return 0;
 }

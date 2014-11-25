@@ -8,7 +8,7 @@ struct target {
   int col[5];
 };
 
-int track_position( struct target, int, int, int );
+int track_position( struct target, int, int );
 int track_target( struct target, int );
 int print_target ( struct target );
 
