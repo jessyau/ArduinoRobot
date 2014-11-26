@@ -1,5 +1,4 @@
 #include "target_methods.h"
-#include <LinkedList.h>
 
 int count = 0;
 int col = 0;
@@ -7,7 +6,7 @@ int row = 0;
 int targetNum = 0;
 
 
-int track_position( struct target _Target, int target_left, int target_right ) {
+int track_position( struct target _Target, int is_target ) {
   if ( count < 6) {
     count++;
     col++;
@@ -15,13 +14,15 @@ int track_position( struct target _Target, int target_left, int target_right ) {
     Serial.print("Column count: ");
     Serial.println(col);
     
-    if( target_right == 1 ) {
-      row = 5;
+    if( is_target == 1 ) {
+      row = random(4,5);
+      
+      Serial.print("Registers target...row: ");
+      Serial.println( row );
+      
       track_target( _Target, targetNum );
-    } else if ( target_left == 1 ) {
-        row = 4;
-        track_target( _Target, targetNum );
-    }
+    } 
+    
   } else if ( count > 5 ) {
     count++;
     col--;
@@ -29,23 +30,29 @@ int track_position( struct target _Target, int target_left, int target_right ) {
      Serial.print("Column count: ");
      Serial.println(col);
      
-     if( target_right == 1 ) {
-       row = 3;
+     if( is_target == 1 ) {
+       row = random(2,3);
+       
+       Serial.print("Registers target...row: ");
+       Serial.println( row );
+       
        track_target( _Target, targetNum );
        
-     } else if( target_right == 1 ) {
-       row = 2;
-       track_target( _Target, targetNum );
-     }
+     } 
   } else if ( count > 9  ) {
-    Serial.print("Column count: ");
-    Serial.println(col);
     
      count++;
      col++;
      
-    if( target_right == 1 ) {
+    Serial.print("Column count: ");
+    Serial.println(col);
+     
+    if( is_target == 1 ) {
        row = 1;
+       
+       Serial.print(" Registers target...row: ");
+       Serial.println( row );
+       
        track_target( _Target, targetNum );
     }
   } 
@@ -58,7 +65,7 @@ int get_col() {
 }
 
 int track_target( struct target _newTarget, int targetNum ) {
-    _newTarget.row[targetNum] = row - 1;
+    _newTarget.row[targetNum] = row;
     _newTarget.col[targetNum] = col + 1;
     targetNum++;
   

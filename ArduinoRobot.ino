@@ -67,8 +67,6 @@ void setup() {
     light_sensor.right_pin = LIGHT_RIGHT;
     
     init_lineTracker( light_sensor );
-//    target_list.row[5] = { 0 0 0 0 0 };
-//    target_list.col[5] = { 0, 0, 0, 0, 0 };
     
     pinMode(GREEN_LED, OUTPUT);
     pinMode(RED2_LED, OUTPUT);
@@ -86,7 +84,9 @@ void loop() {
 
 //    erradicate_right( servo_base, servo_grip );
 //    delay(2000);
-
+    
+    print_target( target_list );
+    
     while(1){};
 //     
 //     Serial.println(check_light(LIGHT_RIGHT));
@@ -165,7 +165,7 @@ void destroy_shit() {
              correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
 //         }
     } else if( check_light( LIGHT_MID ) > lightThresh && check_light( LIGHT_LEFT ) > lightThresh && check_light( LIGHT_RIGHT ) > lightThresh){
-        track_position( target_list, is_left_target( light_sensor ), is_right_target( light_sensor ) );
+        track_position( target_list, is_target( light_sensor ) );
         delay(270);
     }
     else {
@@ -176,7 +176,7 @@ void destroy_shit() {
   
  // Checks for markers for a turn and turns a certain direction based on count
  // Left turns for the first 3 turns, Right turns for the next 3
-  if( is_target( light_sensor )) {
+  if( is_target( light_sensor ) && target_count < 6 ) {
      target_count++;
      
      Serial.print("Target count: ");
@@ -191,6 +191,8 @@ void destroy_shit() {
      
   }
   
-  stop_motors( LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+  if( is_target( light_sensor ) && target_count > 5 )
+      Serial.println("Stop here");
+      stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
   
 }
