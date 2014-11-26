@@ -36,6 +36,7 @@ Servo servo_tilt;
 Servo servo_grip;
 
 int turn_count = 0;
+int target_count = 0;
 
 struct dc_motor drive_motors[2];
 struct line_tracker light_sensor;
@@ -79,15 +80,17 @@ void setup() {
 void loop() {
     
       
-//    while( turn_count < 7 ) {
-//       destroy_shit();
-//     
-//    }
+    while( get_col() < 16 ) {
+       destroy_shit();
+     
+    }
+    
+    print_target(target_list);
 
-    erradicate_right( servo_base, servo_grip );
-    delay(2000);
+//    erradicate_right( servo_base, servo_grip );
+//    delay(2000);
 
-    //while(1){};
+    while(1){};
 //     
 //     Serial.println(check_light(LIGHT_RIGHT));
 //     Serial.flush();
@@ -165,7 +168,7 @@ void destroy_shit() {
              correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
 //         }
     } else if( check_light( LIGHT_MID ) > lightThresh && check_light( LIGHT_LEFT ) > lightThresh && check_light( LIGHT_RIGHT ) > lightThresh){
-        track_position( target_list, turn_count, is_left_target( light_sensor ), is_right_target( light_sensor ) );
+        track_position( );
         delay(270);
     }
     else {
@@ -177,19 +180,67 @@ void destroy_shit() {
  // Checks for markers for a turn and turns a certain direction based on count
  // Left turns for the first 3 turns, Right turns for the next 3
   if( is_turn( light_sensor ) ) {
-     turn_count++;
-     Serial.print("Turn count: ");
-     Serial.println( turn_count );
-     
-     if( turn_count <= 3 ) {
+     if( get_col() == 0 && turn_count == 0) {
+         turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+         turn_count++;
+     } else if( get_col() == 5 && turn_count == 1 ) {
+         turn_count++;
+         Serial.print("Turn count: ");
+         Serial.println( turn_count );
+         
+         turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+     } else if( get_col() == 5 && turn_count == 2 ) {
+       turn_count++;
+       Serial.print("Turn count: ");
+       Serial.println( turn_count );
+       
        Serial.println("turn left");
        turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
-     } else if( turn_count <= 6 ) {
+       Serial.print("has turn left");
+     } else if( get_col() == 10 && turn_count == 3 ) {
        Serial.println("turn right");
+       turn_count++;
+       Serial.print("Turn count: ");
+       Serial.println( turn_count );
+       
        turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
-     } else 
-       Serial.println("stop here");
+     } else if( get_col() == 10 && turn_count == 4 ) {
+       Serial.println("turn right");
+       turn_count++;
+       Serial.print("Turn count: ");
+       Serial.println( turn_count );
+       
+       turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+     } else if( get_col() > 14 && turn_count == 5 ) {
+       Serial.println("turn right");
+       turn_count++;
+       Serial.print("Turn count: ");
+       Serial.println( turn_count );
+       
+       turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
+     } else if( get_col() > 14 && turn_count == 6 ) {
        stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+     } else if( get_col() > 10 ) {
+       track_target( target_list, target_count );
+       target_count++;
+       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+       radiate_begin();
+       erradicate_right( servo_base, servo_grip );
+       radiate_end();
+       drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+       delay(300);
+     } else {
+       track_target( target_list, target_count );
+       target_count++;
+       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+       radiate_begin();
+       erradicate_right( servo_base, servo_grip );
+       delay(1000);
+       erradicate_left( servo_base, servo_grip );
+       radiate_end();
+       drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+       delay(300);
+     }
   }
   
 }

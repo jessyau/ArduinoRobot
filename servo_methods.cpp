@@ -7,8 +7,8 @@ int erradicate_left( Servo servo_base, Servo servo_grip ) {
     
     delay(300);
     
-    servo_grip.write(90);
-    delay(160);
+    servo_grip.write(80);
+    delay(150);
     servo_grip.write(160);
     
   return 0;
@@ -21,8 +21,8 @@ int erradicate_right( Servo servo_base, Servo servo_grip ) {
     
     delay(300);
     
-    servo_grip.write(90);
-    delay(160);
+    servo_grip.write(80);
+    delay(150);
     servo_grip.write(160);
     
   return 0;

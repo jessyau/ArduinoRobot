@@ -64,8 +64,8 @@ int turn_left( struct dc_motor left_motor, struct dc_motor right_motor, int ligh
     
     delay(600);
   
-    set_motor_state( left_motor, 95, BACKWARD );
-    set_motor_state( right_motor, 100, FORWARD );
+    set_motor_state( left_motor, 100, BACKWARD );
+    set_motor_state( right_motor, 105, FORWARD );
     
     while ( check_light( light_pin ) > lightThresh ) {
         delay(85);
@@ -83,8 +83,8 @@ int turn_right( struct dc_motor left_motor, struct dc_motor right_motor, int lig
     
     delay(600);
   
-    set_motor_state( left_motor, 95, FORWARD );
-    set_motor_state( right_motor, 100, BACKWARD );
+    set_motor_state( left_motor, 100, FORWARD );
+    set_motor_state( right_motor, 105, BACKWARD );
     
     while ( check_light( light_pin ) > lightThresh ) {
         delay(80);
