@@ -10,7 +10,5 @@ struct target {
 
 int track_position( );
 int track_target( struct target, int );
-int print_target ( struct target );
-int get_col();
 
 #endif

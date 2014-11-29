@@ -68,8 +68,6 @@ void setup() {
     light_sensor.right_pin = LIGHT_RIGHT;
     
     init_lineTracker( light_sensor );
-//    target_list.row[5] = { 0 0 0 0 0 };
-//    target_list.col[5] = { 0, 0, 0, 0, 0 };
     
     pinMode(GREEN_LED, OUTPUT);
     pinMode(RED2_LED, OUTPUT);
@@ -77,26 +75,14 @@ void setup() {
     
 }
 
+// Frame loop carries out the main execution of code
 void loop() {
     
-      
     while( get_col() < 16 ) {
-       destroy_shit();
-     
+       destroy();
     }
-    
-    print_target(target_list);
-
-//    erradicate_right( servo_base, servo_grip );
-//    delay(2000);
 
     while(1){};
-//     
-//     Serial.println(check_light(LIGHT_RIGHT));
-//     Serial.flush();
-//     delay(200);
-//   
-  
 }
 
 //Turn on Red LEDs to signal the beginning of "tuberculosis treatment"
@@ -115,6 +101,27 @@ void radiate_end() {
    digitalWrite(GREEN_LED, LOW); 
 }
 
+// Target elimination method
+void eliminate_target() {
+   track_target( target_list, target_count );
+   target_count++;
+   stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+   radiate_begin();
+   erradicate_right( servo_base, servo_grip );
+   delay(1000);
+   erradicate_left( servo_base, servo_grip );
+   radiate_end();
+}
+
+// Target elimination to the right
+void eliminate_right() {
+   track_target( target_list, target_count );
+   target_count++;
+   stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
+   radiate_begin();
+   erradicate_right( servo_base, servo_grip );
+   radiate_end();
+}
 
 // For progress report 1 demonstration -- grabs a ball with servo arm and releases it
 void grab_ball() {
@@ -141,32 +148,12 @@ void grab_ball() {
 }
 
 // Conditional statements dictate whether to line correct left or right or track position in map
-void destroy_shit() {
+void destroy() {
   while( check_light(LIGHT_LEFT) > lightThresh || check_light(LIGHT_RIGHT) > lightThresh ) {
     if( check_light(LIGHT_LEFT) < lightThresh ) {
-//      if( is_left_target( light_sensor ) && !(is_turn( light_sensor))) {
-//         Serial.println("left target");
-//           stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//           radiate_begin();
-//           erradicate_left( servo_base, servo_grip );
-//           radiate_end();
-//           drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//           delay(300);
-//       } else {
            correct_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//       }
     } else if( check_light(LIGHT_RIGHT) < lightThresh ) {
-//        if( is_right_target( light_sensor && !(is_turn( light_sensor))) ) {
-//           Serial.println("right target");
-//             stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//             radiate_begin();
-//             erradicate_right( servo_base, servo_grip );
-//             radiate_end();
-//             drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//             delay(300);
-//         } else {
-             correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-//         }
+           correct_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
     } else if( check_light( LIGHT_MID ) > lightThresh && check_light( LIGHT_LEFT ) > lightThresh && check_light( LIGHT_RIGHT ) > lightThresh){
         track_position( );
         delay(270);
@@ -174,70 +161,38 @@ void destroy_shit() {
     else {
         drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
     }
-    
   }
   
  // Checks for markers for a turn and turns a certain direction based on count
  // Left turns for the first 3 turns, Right turns for the next 3
+ // Also checks for when to dispense "radiation" and dispenses it
   if( is_turn( light_sensor ) ) {
      if( get_col() == 0 && turn_count == 0) {
          turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
          turn_count++;
      } else if( get_col() == 5 && turn_count == 1 ) {
          turn_count++;
-         Serial.print("Turn count: ");
-         Serial.println( turn_count );
-         
          turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
      } else if( get_col() == 5 && turn_count == 2 ) {
        turn_count++;
-       Serial.print("Turn count: ");
-       Serial.println( turn_count );
-       
-       Serial.println("turn left");
        turn_left( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
-       Serial.print("has turn left");
      } else if( get_col() == 10 && turn_count == 3 ) {
-       Serial.println("turn right");
        turn_count++;
-       Serial.print("Turn count: ");
-       Serial.println( turn_count );
-       
        turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
      } else if( get_col() == 10 && turn_count == 4 ) {
-       Serial.println("turn right");
        turn_count++;
-       Serial.print("Turn count: ");
-       Serial.println( turn_count );
-       
        turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
      } else if( get_col() > 14 && turn_count == 5 ) {
-       Serial.println("turn right");
-       turn_count++;
-       Serial.print("Turn count: ");
-       Serial.println( turn_count );
-       
+       turn_count++; 
        turn_right( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR], LIGHT_MID );
      } else if( get_col() > 14 && turn_count == 6 ) {
        stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
      } else if( get_col() > 10 ) {
-       track_target( target_list, target_count );
-       target_count++;
-       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-       radiate_begin();
-       erradicate_right( servo_base, servo_grip );
-       radiate_end();
+       eliminate_right();
        drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
        delay(300);
      } else {
-       track_target( target_list, target_count );
-       target_count++;
-       stop_motors( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
-       radiate_begin();
-       erradicate_right( servo_base, servo_grip );
-       delay(1000);
-       erradicate_left( servo_base, servo_grip );
-       radiate_end();
+       eliminate_target();
        drive_straight( drive_motors[LEFT_MOTOR], drive_motors[RIGHT_MOTOR] );
        delay(300);
      }

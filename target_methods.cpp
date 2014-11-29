@@ -6,19 +6,17 @@ int count = 0;
 int row = 0;
 int targetNum = 0;
 
-
+// Tracks column position
 int track_position() {
-    col++; 
-    
-    
-    
+  col++; 
+ 
     Serial.print("Column count: ");
     Serial.println(col);
-
-  
+    
   return 0;
 }
 
+// Tracks and prints out target location
 int track_target( struct target _newTarget, int targetNum ) {
     if( col < 6 ) {
       row = random(3,5);
@@ -49,28 +47,8 @@ int track_target( struct target _newTarget, int targetNum ) {
       Serial.print( col - 9 );
       Serial.println( " ]");
     }
-    
-    
-    
-    
+       
     targetNum++;
   
   return 0; 
-}
-
-int print_target ( struct target _Target ) {
-  int i;
-    for( i = 0; i < 5 && _Target.row[i] != 0; i++ ) {
-      Serial.print( "There is a target at [ ");
-      Serial.print( _Target.row[i] );
-      Serial.print( ", ");
-      Serial.print( _Target.col[i] );
-      Serial.println( " ]" );
-    }
-    
-    return 0;
-}
-
-int get_col() {
-  return col;
 }
